@@ -12,6 +12,7 @@ output:
 analysis <- read.csv("activity.csv", colClasses = c("numeric", "character","numeric"))
 head(analysis)
 library(lattice)
+analysis$date <- as.Date(analysis$date, "%Y-%m-%d") ##make it a date type!
 
 ```
 
@@ -112,3 +113,44 @@ median(stepsTotalNA$steps)
 ```
 After replacing the NA values with the mean, the values (obviously) has differed
 ## Are there differences in activity patterns between weekdays and weekends?
+
+Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+```{r}
+day <- weekdays(analysis$date)
+daylevel <- vector()
+
+for (i in 1:nrow(analysis)) 
+{
+    if (day[i] == "Saturday") 
+    {
+        daylevel[i] <- "Weekend"
+    } 
+    else if (day[i] == "Sunday") 
+    {
+        daylevel[i] <- "Weekend"
+    } 
+    else 
+    {
+        daylevel[i] <- "Weekday"
+    }
+} 
+analysis$daylevel <- daylevel
+analysis$daylevel <- factor(analysis$daylevel)
+dayType <- aggregate(steps ~ interval + daylevel, data = analysis, mean)
+names(dayType) <- c("interval", "daylevel", "steps")
+```
+Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+```{r}
+xyplot(steps ~ interval | daylevel, dayType, type = "l",layout = c(1, 2), xlab = "Interval", ylab = "Number of steps")
+```
+
+
+
+
+
+
+
+
+
+
+
